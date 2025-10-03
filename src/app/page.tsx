@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
-import { ThemeToggle } from '@/components/theme-toggle';
-import Header from '@/components/auth/Header';
-import PhoneStep from '@/components/auth/PhoneStep';
-import OTPStep from '@/components/auth/OTPStep';
-import type { Country } from '@/types/country';
-import { validatePhone } from '@/lib/phone-validation';
-import { useRouter } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { login } from '@/store/slices/authSlice';
-import type { RootState } from '@/store';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
+import Header from "@/components/auth/Header";
+import PhoneStep from "@/components/auth/PhoneStep";
+import OTPStep from "@/components/auth/OTPStep";
+import type { Country } from "@/types/country";
+import { validatePhone } from "@/lib/phone-validation";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { login } from "@/store/slices/authSlice";
+import type { RootState } from "@/store";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,12 +21,12 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [countriesLoading, setCountriesLoading] = useState(true);
-  const [selectedCountry, setSelectedCountry] = useState<string>('+1');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<string>("+1");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     setCountriesLoading(true);
-    fetch('https://restcountries.com/v3.1/all?fields=name,idd,cca2,flags')
+    fetch("https://restcountries.com/v3.1/all?fields=name,idd,cca2,flags")
       .then((res) => res.json())
       .then((data: Country[]) => {
         const sorted = data
@@ -42,14 +42,14 @@ export default function LoginPage() {
           .sort((a, b) => a.name.common.localeCompare(b.name.common));
         setCountries(sorted);
       })
-      .catch(() => toast.error('Failed to load countries'))
+      .catch(() => toast.error("Failed to load countries"))
       .finally(() => setCountriesLoading(false));
   }, []);
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthed) {
-      router.replace('/dashboard');
+      router.replace("/dashboard");
     }
   }, [isAuthed, router]);
 
@@ -59,39 +59,41 @@ export default function LoginPage() {
   }
 
   const handleSendOTP = () => {
-    setError('');
+    setError("");
     const validation = validatePhone(selectedCountry, phoneNumber);
     if (!validation.valid) {
-      setError(validation.message || 'Please enter a valid phone number');
+      setError(validation.message || "Please enter a valid phone number");
       return;
     }
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
       setOtpSent(true);
-      toast.success('OTP sent successfully!');
+      toast.success("OTP sent successfully!");
     }, 1500);
   };
 
   const handleVerifyOTP = () => {
-    setError('');
+    setError("");
     if (otp.length !== 6) {
-      setError('Please enter a valid 6-digit OTP');
+      setError("Please enter a valid 6-digit OTP");
       return;
     }
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      toast.success('Login successful!');
+      toast.success("Login successful!");
       // simple auth state + navigate
-      dispatch(login({ id: 'user_1', phone: `${selectedCountry}${phoneNumber}` }));
-      router.push('/dashboard');
+      dispatch(
+        login({ id: "user_1", phone: `${selectedCountry}${phoneNumber}` }),
+      );
+      router.push("/dashboard");
     }, 1500);
   };
 
   const getCountryCode = (country: Country) => {
     const root = country.idd.root;
-    const suffix = country.idd.suffixes?.[0] || '';
+    const suffix = country.idd.suffixes?.[0] || "";
     return `${root}${suffix}`;
   };
 
@@ -146,8 +148,8 @@ export default function LoginPage() {
                   onVerify={handleVerifyOTP}
                   onBack={() => {
                     setOtpSent(false);
-                    setOtp('');
-                    setError('');
+                    setOtp("");
+                    setError("");
                   }}
                   label={`Enter OTP (Sent to ${selectedCountry} ${phoneNumber})`}
                 />

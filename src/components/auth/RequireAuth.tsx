@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppSelector } from '@/store/hooks';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/store/hooks";
 
-export default function RequireAuth({ children }: { children: React.ReactNode }) {
+export default function RequireAuth({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const isAuthed = useAppSelector((s) => s.auth.isAuthenticated);
   const [mounted, setMounted] = useState(false);
@@ -16,7 +20,7 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (mounted && !isAuthed) {
-      router.replace('/');
+      router.replace("/");
     }
   }, [mounted, isAuthed, router]);
 

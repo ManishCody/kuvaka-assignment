@@ -1,11 +1,15 @@
 "use client";
 
-import { Button } from '@/components/ui/button';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Loader as Loader2 } from 'lucide-react';
-import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from "@/components/ui/button";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Loader as Loader2 } from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface OTPStepProps {
   otp: string;
@@ -20,9 +24,9 @@ interface OTPStepProps {
 const OtpSchema = z.object({
   code: z
     .string()
-    .min(6, 'Enter 6 digits')
-    .max(6, 'Enter 6 digits')
-    .regex(/^\d{6}$/, 'OTP must be 6 digits'),
+    .min(6, "Enter 6 digits")
+    .max(6, "Enter 6 digits")
+    .regex(/^\d{6}$/, "OTP must be 6 digits"),
 });
 
 export default function OTPStep({
@@ -32,11 +36,15 @@ export default function OTPStep({
   isLoading,
   onVerify,
   onBack,
-  label = 'Enter OTP',
+  label = "Enter OTP",
 }: OTPStepProps) {
-  const { control, handleSubmit, formState: { errors } } = useForm<{ code: string}>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ code: string }>({
     resolver: zodResolver(OtpSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: { code: otp },
   });
 
@@ -77,7 +85,9 @@ export default function OTPStep({
       </div>
 
       {errors.code && (
-        <p className="text-sm text-destructive text-center">{errors.code.message}</p>
+        <p className="text-sm text-destructive text-center">
+          {errors.code.message}
+        </p>
       )}
       {error ? (
         <p className="text-sm text-destructive text-center">{error}</p>
@@ -90,7 +100,7 @@ export default function OTPStep({
             Verifying...
           </>
         ) : (
-          'Verify OTP'
+          "Verify OTP"
         )}
       </Button>
 
@@ -100,4 +110,3 @@ export default function OTPStep({
     </form>
   );
 }
-

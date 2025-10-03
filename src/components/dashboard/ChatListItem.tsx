@@ -1,12 +1,12 @@
 "use client";
 
-import { Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
-import { useAppDispatch } from '@/store/hooks';
-import { deleteChat } from '@/store/slices/chatsSlice';
-import { toast } from 'sonner';
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/store/hooks";
+import { deleteChat } from "@/store/slices/chatsSlice";
+import { toast } from "sonner";
 
 export default function ChatListItem({
   id,
@@ -27,8 +27,8 @@ export default function ChatListItem({
   return (
     <div
       className={cn(
-        'group flex relative items-start gap-3 p-3 rounded-lg border hover:bg-muted cursor-pointer',
-        active && 'bg-muted'
+        "group flex relative items-start gap-3 p-3 rounded-lg border hover:bg-muted cursor-pointer",
+        active && "bg-muted",
       )}
       onClick={() => router.push(`/chat/${id}`)}
     >
@@ -36,7 +36,10 @@ export default function ChatListItem({
         <div className="flex items-center justify-between gap-2">
           <div className="font-medium truncate">{title}</div>
           <div className="text-xs text-muted-foreground shrink-0">
-            {new Date(updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(updatedAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
             <Button
               variant="ghost"
               size="icon"
@@ -51,9 +54,10 @@ export default function ChatListItem({
             </Button>
           </div>
         </div>
-        <div className="text-sm text-muted-foreground truncate">{lastMessage}</div>
+        <div className="text-sm text-muted-foreground truncate">
+          {lastMessage}
+        </div>
       </div>
-
     </div>
   );
 }

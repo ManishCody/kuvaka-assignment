@@ -1,36 +1,34 @@
 "use client";
 
-import { useRef, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Image as ImageIcon, Send, Copy } from 'lucide-react';
+import { useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Image as ImageIcon, Send } from "lucide-react";
 
 export default function MessageInput({
   value,
   onChange,
   onSend,
-  images = [],
   onSelectImages,
-  onRemoveImage,
   disabled,
 }: {
   value: string;
   onChange: (v: string) => void;
   onSend: () => void;
-  images?: string[];
   onSelectImages: (files: File[]) => void;
-  onRemoveImage: (index: number) => void;
+  images?: string[]; // accepted but not used internally
+  onRemoveImage?: (index: number) => void; // accepted but not used internally
   disabled?: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const textRef = useRef<HTMLTextAreaElement | null>(null);
-  const [copied, setCopied] = useState(false);
+  // local copy UI is not used here; keep minimal state footprint
 
   // Auto-resize the textarea height based on content
   useEffect(() => {
     const el = textRef.current;
     if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 200) + 'px'; // cap height ~200px
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 200) + "px"; // cap height ~200px
   }, [value]);
 
   return (
@@ -61,7 +59,7 @@ export default function MessageInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
+          if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             onSend();
           }
@@ -69,11 +67,14 @@ export default function MessageInput({
         rows={1}
         className="flex-1 resize-none rounded-md border px-3 py-2 bg-white text-black dark:bg-black dark:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-h-52"
       />
-      <Button onClick={onSend} disabled={disabled} className="gap-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+      <Button
+        onClick={onSend}
+        disabled={disabled}
+        className="gap-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
         <Send className="h-4 w-4" />
         Send
       </Button>
     </div>
   );
 }
-

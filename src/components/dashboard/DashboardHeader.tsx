@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import type { RootState } from '@/store';
-import { logout } from '@/store/slices/authSlice';
-import { setMobileDrawerOpen, setSearchQuery } from '@/store/slices/uiSlice';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Menu, LogOut } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import type { RootState } from "@/store";
+import { logout } from "@/store/slices/authSlice";
+import { setMobileDrawerOpen, setSearchQuery } from "@/store/slices/uiSlice";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Menu, LogOut } from "lucide-react";
 
 export default function DashboardHeader() {
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ export default function DashboardHeader() {
           className="gap-2"
           onClick={() => {
             dispatch(logout());
-            router.push('/');
+            router.push("/");
           }}
         >
           <LogOut className="h-4 w-4" /> Logout

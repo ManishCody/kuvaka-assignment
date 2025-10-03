@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type UIState = {
   mobileDrawerOpen: boolean;
@@ -8,12 +8,12 @@ export type UIState = {
 
 const initialState: UIState = {
   mobileDrawerOpen: false,
-  searchQuery: '',
+  searchQuery: "",
   showHistory: false,
 };
 
 const uiSlice = createSlice({
-  name: 'ui',
+  name: "ui",
   initialState,
   reducers: {
     setMobileDrawerOpen(state, action: PayloadAction<boolean>) {
@@ -31,5 +31,10 @@ const uiSlice = createSlice({
   },
 });
 
-export const { setMobileDrawerOpen, setSearchQuery, setShowHistory, toggleShowHistory } = uiSlice.actions;
+export const {
+  setMobileDrawerOpen,
+  setSearchQuery,
+  setShowHistory,
+  toggleShowHistory,
+} = uiSlice.actions;
 export default uiSlice.reducer;

@@ -1,13 +1,17 @@
 "use client";
 
-import { ArrowLeft, Menu, PanelsLeftRight, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import type { RootState } from '@/store';
-import { setMobileDrawerOpen, toggleShowHistory, setSearchQuery } from '@/store/slices/uiSlice';
-import { Button } from '@/components/ui/button';
-import { createChat } from '@/store/slices/chatsSlice';
-import { useState } from 'react';
+import { ArrowLeft, Menu, PanelsLeftRight, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import type { RootState } from "@/store";
+import {
+  setMobileDrawerOpen,
+  toggleShowHistory,
+  setSearchQuery,
+} from "@/store/slices/uiSlice";
+import { Button } from "@/components/ui/button";
+import { createChat } from "@/store/slices/chatsSlice";
+import { useState } from "react";
 
 export default function ChatHeader({ title }: { title: string }) {
   const router = useRouter();
@@ -19,9 +23,9 @@ export default function ChatHeader({ title }: { title: string }) {
     if (creating) return;
     setCreating(true);
     // Clear search so the new chat is not hidden by a filter
-    dispatch(setSearchQuery(''));
-    const action = dispatch(createChat({ title: 'New chat' }));
-    const id = (action as any).payload?.id as string | undefined;
+    dispatch(setSearchQuery(""));
+    const action = dispatch(createChat({ title: "New chat" }));
+    const id = action.payload?.id as string | undefined;
     if (id) router.push(`/chat/${id}`);
     setTimeout(() => setCreating(false), 600);
   };
@@ -37,7 +41,7 @@ export default function ChatHeader({ title }: { title: string }) {
         </button>
         <button
           className="hidden md:inline-flex p-2 rounded hover:bg-muted"
-          aria-label={showHistory ? 'Hide history' : 'Show history'}
+          aria-label={showHistory ? "Hide history" : "Show history"}
           onClick={() => dispatch(toggleShowHistory())}
         >
           <PanelsLeftRight className="h-5 w-5" />
@@ -51,7 +55,12 @@ export default function ChatHeader({ title }: { title: string }) {
         </button>
         <div className="font-medium truncate">{title}</div>
         <div className="flex-1" />
-        <Button size="sm" className="gap-2" onClick={handleCreate} disabled={creating}>
+        <Button
+          size="sm"
+          className="gap-2"
+          onClick={handleCreate}
+          disabled={creating}
+        >
           <Plus className="h-4 w-4" /> New
         </Button>
       </div>

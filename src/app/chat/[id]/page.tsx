@@ -1,33 +1,38 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import type { RootState } from '@/store';
-import { addMessage } from '@/store/slices/chatsSlice';
-import type { Chat, Message } from '@/store/slices/chatsSlice';
-import ChatHeader from '@/components/chat/ChatHeader';
-import RequireAuth from '@/components/auth/RequireAuth';
-import MessageBubble from '@/components/chat/MessageBubble';
-import TypingIndicator from '@/components/chat/TypingIndicator';
-import MessageInput from '@/components/chat/MessageInput';
-import MessageSkeleton from '@/components/chat/MessageSkeleton';
-import ChatDrawer from '@/components/dashboard/ChatDrawer';
-import ChatList from '@/components/dashboard/ChatList';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import type { RootState } from "@/store";
+import { addMessage } from "@/store/slices/chatsSlice";
+import type { Chat, Message } from "@/store/slices/chatsSlice";
+import ChatHeader from "@/components/chat/ChatHeader";
+import RequireAuth from "@/components/auth/RequireAuth";
+import MessageBubble from "@/components/chat/MessageBubble";
+import TypingIndicator from "@/components/chat/TypingIndicator";
+import MessageInput from "@/components/chat/MessageInput";
+import MessageSkeleton from "@/components/chat/MessageSkeleton";
+import ChatDrawer from "@/components/dashboard/ChatDrawer";
+import ChatList from "@/components/dashboard/ChatList";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function ChatRoomPage() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  const chat = useAppSelector((s: RootState) => s.chats.chats.find((c: Chat) => c.id === id));
-  const messages = useAppSelector((s: RootState) => s.chats.messages[id!] || []) as Message[];
+  const chat = useAppSelector((s: RootState) =>
+    s.chats.chats.find((c: Chat) => c.id === id),
+  );
+  const messages = useAppSelector(
+    (s: RootState) => s.chats.messages[id!] || [],
+  ) as Message[];
   const showHistory = useAppSelector((s: RootState) => s.ui.showHistory);
 
-  const title = chat?.title || 'Chat';
+  const title = chat?.title || "Chat";
 
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState("");
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [pageSize] = useState(20);
@@ -39,7 +44,7 @@ export default function ChatRoomPage() {
   const pendingAiRef = useRef<number>(0); // how many AI replies are pending
   const [imageModalSrc, setImageModalSrc] = useState<string | null>(null);
   // Dynamic bottom padding for message list to avoid overlap with sticky footer
-  const bottomPad = imagePreviews.length > 0 ? 'pb-48 md:pb-40' : 'pb-32';
+  const bottomPad = imagePreviews.length > 0 ? "pb-48 md:pb-40" : "pb-32";
 
   // Helper: scroll to bottom (smooth by default unless immediate)
   const scrollToBottom = (immediate = false) => {
@@ -53,7 +58,7 @@ export default function ChatRoomPage() {
           const target = scrollRef.current.scrollHeight;
           // Prefer native smooth scrolling when available
           try {
-            scrollRef.current.scrollTo({ top: target, behavior: 'smooth' });
+            scrollRef.current.scrollTo({ top: target, behavior: "smooth" });
           } catch {
             scrollRef.current.scrollTop = target;
           }
@@ -77,7 +82,7 @@ export default function ChatRoomPage() {
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     if (nearBottom) {
       try {
-        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
       } catch {
         el.scrollTop = el.scrollHeight;
       }
@@ -87,7 +92,7 @@ export default function ChatRoomPage() {
   // If the latest message is from the user, snap to bottom regardless of current position
   useEffect(() => {
     const last = messages[messages.length - 1];
-    if (last?.role === 'user') {
+    if (last?.role === "user") {
       scrollToBottom(false);
     }
   }, [messages]);
@@ -110,10 +115,16 @@ export default function ChatRoomPage() {
     const now = new Date().toISOString();
     // 1) Store user message immediately
     dispatch(
-      addMessage({ chatId: id, role: 'user', content: draft || '', createdAt: now, imageUrls: imagePreviews })
+      addMessage({
+        chatId: id,
+        role: "user",
+        content: draft || "",
+        createdAt: now,
+        imageUrls: imagePreviews,
+      }),
     );
     // 2) Clear input and show typing
-    setDraft('');
+    setDraft("");
     setImagePreviews([]);
     // 2.5) Smooth scroll to bottom after sending user message
     scrollToBottom(false);
@@ -126,9 +137,14 @@ export default function ChatRoomPage() {
     pendingAiRef.current += 1;
     setIsTyping(true);
     setTimeout(() => {
-      const reply = 'Here is a helpful answer with insights…';
+      const reply = "Here is a helpful answer with insights…";
       dispatch(
-        addMessage({ chatId: id, role: 'ai', content: reply, createdAt: new Date().toISOString() })
+        addMessage({
+          chatId: id,
+          role: "ai",
+          content: reply,
+          createdAt: new Date().toISOString(),
+        }),
       );
       pendingAiRef.current -= 1;
       setIsTyping(pendingAiRef.current > 0);
@@ -167,9 +183,14 @@ export default function ChatRoomPage() {
           <div className="flex-1 grid place-items-center px-6">
             <div className="text-center text-muted-foreground border rounded-lg p-10 max-w-md w-full">
               <MessageSquare className="h-8 w-8 mx-auto mb-3" />
-              <div className="mb-4">This chat was not found. It may have been deleted or the link is invalid.</div>
+              <div className="mb-4">
+                This chat was not found. It may have been deleted or the link is
+                invalid.
+              </div>
               <Link href="/dashboard">
-                <Button className="gap-2"><ArrowLeft className="h-4 w-4" /> Back to dashboard</Button>
+                <Button className="gap-2">
+                  <ArrowLeft className="h-4 w-4" /> Back to dashboard
+                </Button>
               </Link>
             </div>
           </div>
@@ -184,105 +205,127 @@ export default function ChatRoomPage() {
         <ChatHeader title={title} />
         <ChatDrawer />
 
-      <main className={`w-full flex-1 px-4 py-4 grid gap-6 ${showHistory ? 'grid-cols-[320px_1fr]' : 'grid-cols-1'} grid-rows-[1fr_auto] overflow-hidden h-full min-h-0 items-stretch`}>
-        {showHistory && (
-          <aside className="block pr-4 border-r h-full min-h-0 row-span-2">
-            <div className={`h-full overflow-y-auto overflow-x-hidden  `}>
-              <ChatList activeId={id} />
-            </div>
-          </aside>
-        )}
-
-        <section className="flex flex-col md:pl-4 min-h-0 h-full">
-          <div
-            ref={scrollRef}
-            onScroll={onScrollMessages}
-            className={`flex-1 flex flex-col gap-4 ${bottomPad} border-b overflow-y-auto px-3 pr-4 md:px-4 [scrollbar-gutter:stable_both-edges]`}
-          >
-            {/* Empty: no messages yet */}
-            {messages.length === 0 && (
-              <div className="text-center text-muted-foreground border rounded-lg p-8 my-4">
-                <div className="flex flex-col items-center gap-2">
-                  <MessageSquare className="h-6 w-6" />
-                  <div className="text-sm">No messages yet. Type a message below to start the conversation.</div>
-                </div>
+        <main
+          className={`w-full flex-1 px-4 py-4 grid gap-6 ${showHistory ? "grid-cols-[320px_1fr]" : "grid-cols-1"} grid-rows-[1fr_auto] overflow-hidden h-full min-h-0 items-stretch`}
+        >
+          {showHistory && (
+            <aside className="block pr-4 border-r h-full min-h-0 row-span-2">
+              <div className={`h-full overflow-y-auto overflow-x-hidden  `}>
+                <ChatList activeId={id} />
               </div>
-            )}
+            </aside>
+          )}
 
-            {/* Loading older skeleton */}
-            {loadingOlder && messages.length > 0 && (
-              <div className="space-y-2">
-                <MessageSkeleton />
-                <MessageSkeleton />
-              </div>
-            )}
-
-            {messages
-              .slice(Math.max(0, messages.length - visibleCount))
-              .map((m: Message) => (
-              <MessageBubble
-                key={m.id}
-                role={m.role}
-                content={m.content}
-                createdAt={m.createdAt}
-                imageUrl={m.imageUrl}
-                imageUrls={(m as any).imageUrls}
-              />
-            ))}
-
-            {/* Input-time previews are shown inside MessageInput now */}
-
-            {isTyping && (
-              <div className="mr-auto">
-                <TypingIndicator />
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Footer row inside the same grid to let history span 100% height */}
-        <div className={`row-start-2 ${showHistory ? 'col-start-2' : 'col-start-1'} w-full bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t`}>
-          <div className="w-full flex flex-col gap-2 px-4 py-3">
-            {imagePreviews.length > 0 && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {imagePreviews.map((src, idx) => (
-                  <div key={idx} className="relative h-16 w-16 shrink-0 rounded-md overflow-hidden border">
-                    <button
-                      aria-label={`Open image ${idx + 1}`}
-                      className="block h-full w-full"
-                      onClick={() => setImageModalSrc(src)}
-                    >
-                      <img src={src} alt={`attachment-${idx}`} className="h-full w-full object-cover" />
-                    </button>
-                    <button
-                      aria-label="Remove image"
-                      className="absolute -top-1 -right-1 bg-background/90 border rounded-full p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      onClick={() => {
-                        setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
-                      }}
-                    >
-                      ×
-                    </button>
+          <section className="flex flex-col md:pl-4 min-h-0 h-full">
+            <div
+              ref={scrollRef}
+              onScroll={onScrollMessages}
+              className={`flex-1 flex flex-col gap-4 ${bottomPad} border-b overflow-y-auto px-3 pr-4 md:px-4 [scrollbar-gutter:stable_both-edges]`}
+            >
+              {/* Empty: no messages yet */}
+              {messages.length === 0 && (
+                <div className="text-center text-muted-foreground border rounded-lg p-8 my-4">
+                  <div className="flex flex-col items-center gap-2">
+                    <MessageSquare className="h-6 w-6" />
+                    <div className="text-sm">
+                      No messages yet. Type a message below to start the
+                      conversation.
+                    </div>
                   </div>
+                </div>
+              )}
+
+              {/* Loading older skeleton */}
+              {loadingOlder && messages.length > 0 && (
+                <div className="space-y-2">
+                  <MessageSkeleton />
+                  <MessageSkeleton />
+                </div>
+              )}
+
+              {messages
+                .slice(Math.max(0, messages.length - visibleCount))
+                .map((m: Message) => (
+                  <MessageBubble
+                    key={m.id}
+                    role={m.role}
+                    content={m.content}
+                    createdAt={m.createdAt}
+                    imageUrl={m.imageUrl}
+                    imageUrls={m.imageUrls}
+                  />
                 ))}
-              </div>
-            )}
-            <MessageInput
-              value={draft}
-              onChange={setDraft}
-              onSend={handleSend}
-              images={imagePreviews}
-              onSelectImages={(files) => {
-                const urls = files.map((f) => URL.createObjectURL(f));
-                setImagePreviews((prev) => [...prev, ...urls]);
-              }}
-              onRemoveImage={(index) => {
-                setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-              }}
-            />
+
+              {/* Input-time previews are shown inside MessageInput now */}
+
+              {isTyping && (
+                <div className="mr-auto">
+                  <TypingIndicator />
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Footer row inside the same grid to let history span 100% height */}
+          <div
+            className={`row-start-2 ${showHistory ? "col-start-2" : "col-start-1"} w-full bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t`}
+          >
+            <div className="w-full flex flex-col gap-2 px-4 py-3">
+              {imagePreviews.length > 0 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {imagePreviews.map((src, idx) => (
+                    <div
+                      key={idx}
+                      className="relative h-16 w-16 shrink-0 rounded-md overflow-hidden border"
+                    >
+                      <button
+                        aria-label={`Open image ${idx + 1}`}
+                        className="block h-full w-full"
+                        onClick={() => setImageModalSrc(src)}
+                      >
+                        <div className="relative h-full w-full">
+                          <Image
+                            src={src}
+                            alt={`attachment-${idx}`}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                        </div>
+                      </button>
+                      <button
+                        aria-label="Remove image"
+                        className="absolute -top-1 -right-1 bg-background/90 border rounded-full p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        onClick={() => {
+                          setImagePreviews((prev) =>
+                            prev.filter((_, i) => i !== idx),
+                          );
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <MessageInput
+                value={draft}
+                onChange={setDraft}
+                onSend={handleSend}
+                images={imagePreviews}
+                onSelectImages={(files) => {
+                  const urls = files.map((f) => URL.createObjectURL(f));
+                  setImagePreviews((prev) => [...prev, ...urls]);
+                }}
+                onRemoveImage={(index) => {
+                  setImagePreviews((prev) =>
+                    prev.filter((_, i) => i !== index),
+                  );
+                }}
+              />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
 
         {imageModalSrc && (
           <div
@@ -295,7 +338,15 @@ export default function ChatRoomPage() {
               className="relative max-w-[50vw] max-h-[50vh] w-[50vw] h-[50vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <img src={imageModalSrc} alt="preview" className="h-full w-full object-contain rounded-md bg-background" />
+              <div className="relative h-full w-full">
+                <Image
+                  src={imageModalSrc}
+                  alt="preview"
+                  fill
+                  sizes="50vw"
+                  className="object-contain rounded-md bg-background"
+                />
+              </div>
               <button
                 className="absolute -top-3 -right-3 bg-background border rounded-full px-2 py-1 text-xs"
                 onClick={() => setImageModalSrc(null)}
