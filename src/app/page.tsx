@@ -1,103 +1,161 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import { ThemeToggle } from '@/components/theme-toggle';
+import Header from '@/components/auth/Header';
+import PhoneStep from '@/components/auth/PhoneStep';
+import OTPStep from '@/components/auth/OTPStep';
+import type { Country } from '@/types/country';
+import { validatePhone } from '@/lib/phone-validation';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { login } from '@/store/slices/authSlice';
+import type { RootState } from '@/store';
+
+export default function LoginPage() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const isAuthed = useAppSelector((s: RootState) => s.auth.isAuthenticated);
+  const [mounted, setMounted] = useState(false);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [countriesLoading, setCountriesLoading] = useState(true);
+  const [selectedCountry, setSelectedCountry] = useState<string>('+1');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setCountriesLoading(true);
+    fetch('https://restcountries.com/v3.1/all?fields=name,idd,cca2,flags')
+      .then((res) => res.json())
+      .then((data: Country[]) => {
+        const sorted = data
+          .filter((c) => c.idd?.root)
+          .sort((a, b) => a.name.common.localeCompare(b.name.common));
+        setCountries(sorted);
+      })
+      .catch(() => toast.error('Failed to load countries'))
+      .finally(() => setCountriesLoading(false));
+  }, []);
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (isAuthed) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthed, router]);
+
+  // While mounted and authed, render a stable container to avoid flicker
+  if (mounted && isAuthed) {
+    return <div className="min-h-screen" />;
+  }
+
+  const handleSendOTP = () => {
+    setError('');
+    const validation = validatePhone(selectedCountry, phoneNumber);
+    if (!validation.valid) {
+      setError(validation.message || 'Please enter a valid phone number');
+      return;
+    }
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setOtpSent(true);
+      toast.success('OTP sent successfully!');
+    }, 1500);
+  };
+
+  const handleVerifyOTP = () => {
+    setError('');
+    if (otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success('Login successful!');
+      // simple auth state + navigate
+      dispatch(login({ id: 'user_1', phone: `${selectedCountry}${phoneNumber}` }));
+      router.push('/dashboard');
+    }, 1500);
+  };
+
+  const getCountryCode = (country: Country) => {
+    const root = country.idd.root;
+    const suffix = country.idd.suffixes?.[0] || '';
+    return `${root}${suffix}`;
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <div className="absolute top-4 right-4 z-30">
+        <ThemeToggle />
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        <Header />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className="bg-card border rounded-2xl p-8 shadow-lg">
+          <AnimatePresence mode="wait">
+            {!otpSent ? (
+              <motion.div
+                key="phone"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-4"
+              >
+                <PhoneStep
+                  countries={countries}
+                  selectedCountry={selectedCountry}
+                  setSelectedCountry={setSelectedCountry}
+                  phoneNumber={phoneNumber}
+                  setPhoneNumber={setPhoneNumber}
+                  error={error}
+                  onSend={handleSendOTP}
+                  isLoading={isLoading || countriesLoading}
+                  loadingCountries={countriesLoading}
+                  getCountryCode={getCountryCode}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="otp"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-4"
+              >
+                <OTPStep
+                  otp={otp}
+                  setOtp={setOtp}
+                  error={error}
+                  isLoading={isLoading}
+                  onVerify={handleVerifyOTP}
+                  onBack={() => {
+                    setOtpSent(false);
+                    setOtp('');
+                    setError('');
+                  }}
+                  label={`Enter OTP (Sent to ${selectedCountry} ${phoneNumber})`}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </motion.div>
     </div>
   );
 }
