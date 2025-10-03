@@ -5,14 +5,12 @@ import uiReducer from "./slices/uiSlice";
 import type { AuthState } from "./slices/authSlice";
 import type { ChatsState } from "./slices/chatsSlice";
 
-// Safely read persisted auth state on the client only
 function loadPersistedAuth() {
   if (typeof window === "undefined") return undefined;
   try {
     const raw = localStorage.getItem("auth");
     if (!raw) return undefined;
     const parsed = JSON.parse(raw);
-    // basic shape check
     if (
       typeof parsed === "object" &&
       parsed !== null &&
@@ -21,13 +19,10 @@ function loadPersistedAuth() {
     ) {
       return parsed;
     }
-  } catch {
-    // ignore corrupted data
-  }
+  } catch {}
   return undefined;
 }
 
-// Safely read persisted chats state on the client only
 function loadPersistedChats() {
   if (typeof window === "undefined") return undefined;
   try {
@@ -42,9 +37,7 @@ function loadPersistedChats() {
     ) {
       return parsed;
     }
-  } catch {
-    // ignore corrupted data
-  }
+  } catch {}
   return undefined;
 }
 
@@ -65,11 +58,9 @@ export const store = configureStore({
     chats: chatsReducer,
     ui: uiReducer,
   },
-  // Only provide preloadedState on the client
   preloadedState: preloadedState,
 });
 
-// Persist auth slice on the client
 if (typeof window !== "undefined") {
   try {
     store.subscribe(() => {
@@ -77,10 +68,7 @@ if (typeof window !== "undefined") {
       localStorage.setItem("auth", JSON.stringify(state.auth));
       localStorage.setItem("chats", JSON.stringify(state.chats));
     });
-  } catch {
-    // Ignore persistence errors (e.g., private mode)
-  }
-}
+  } catch {}}
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

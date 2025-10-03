@@ -7,19 +7,19 @@ export type Message = {
   content: string;
   imageUrl?: string;
   imageUrls?: string[];
-  createdAt: string; // ISO timestamp
+  createdAt: string;
 };
 
 export type Chat = {
   id: string;
   title: string;
   lastMessage: string;
-  updatedAt: string; // ISO timestamp
+  updatedAt: string; 
 };
 
 export type ChatsState = {
   chats: Chat[];
-  messages: Record<string, Message[]>; // chatId -> messages
+  messages: Record<string, Message[]>; 
 };
 
 const now = new Date().toISOString();

@@ -45,15 +45,13 @@ export default function LoginPage() {
       .catch(() => toast.error("Failed to load countries"))
       .finally(() => setCountriesLoading(false));
   }, []);
-
-  // Redirect to dashboard if already authenticated
+  
   useEffect(() => {
     if (isAuthed) {
       router.replace("/dashboard");
     }
   }, [isAuthed, router]);
 
-  // While mounted and authed, render a stable container to avoid flicker
   if (mounted && isAuthed) {
     return <div className="min-h-screen" />;
   }
@@ -83,7 +81,6 @@ export default function LoginPage() {
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Login successful!");
-      // simple auth state + navigate
       dispatch(
         login({ id: "user_1", phone: `${selectedCountry}${phoneNumber}` }),
       );
