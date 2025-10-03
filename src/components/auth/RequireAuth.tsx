@@ -13,7 +13,6 @@ export default function RequireAuth({
   const isAuthed = useAppSelector((s) => s.auth.isAuthenticated);
   const [mounted, setMounted] = useState(false);
 
-  // Ensure consistent SSR/CSR markup by delaying auth gating until after mount
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -24,7 +23,6 @@ export default function RequireAuth({
     }
   }, [mounted, isAuthed, router]);
 
-  // While not mounted, render a stable container to avoid hydration mismatch
   if (!mounted) {
     return <div className="min-h-screen" />;
   }

@@ -68,13 +68,10 @@ export default function PhoneStep({
     },
   });
 
-  // keep external state in sync for parent consumers
   const onSubmit = () => {
     onSend();
   };
 
-  // Radix Select requires unique values; some countries share the same dial code.
-  // Deduplicate by dial code so each SelectItem value is unique.
   const uniqueCountries = useMemo(() => {
     const seen = new Set<string>();
     const out: Country[] = [];
