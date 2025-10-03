@@ -75,6 +75,8 @@ const initialState: ChatsState = {
   },
 };
 
+export const chatsInitialState = initialState;
+
 const chatsSlice = createSlice({
   name: "chats",
   initialState,

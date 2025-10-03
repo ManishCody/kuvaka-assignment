@@ -15,6 +15,8 @@ const initialState: AuthState = {
   user: null,
 };
 
+export const authInitialState = initialState;
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
