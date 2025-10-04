@@ -81,6 +81,9 @@ const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
+    hydrate(state, action: PayloadAction<ChatsState>) {
+      return action.payload;
+    },
     createChat: {
       reducer(state, action: PayloadAction<{ id: string; title: string }>) {
         const { id, title } = action.payload;
@@ -129,5 +132,5 @@ const chatsSlice = createSlice({
   },
 });
 
-export const { createChat, deleteChat, addMessage } = chatsSlice.actions;
+export const { hydrate, createChat, deleteChat, addMessage } = chatsSlice.actions;
 export default chatsSlice.reducer;
