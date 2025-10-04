@@ -14,6 +14,7 @@ import ChatEmptyState from "@/components/chat/ChatEmptyState";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatFooter from "@/components/chat/ChatFooter";
 import ImageModal from "@/components/chat/ImageModal";
+import ChatPageSkeleton from "@/components/chat/ChatPageSkeleton";
 
 export default function ChatRoomPage() {
   const { id } = useParams<{ id: string }>();
@@ -140,14 +141,14 @@ export default function ChatRoomPage() {
 
   if (!chat) {
     return (
-      <RequireAuth>
+      <RequireAuth fallback={<ChatPageSkeleton />}>
         <ChatEmptyState />
       </RequireAuth>
     );
   }
 
   return (
-    <RequireAuth>
+    <RequireAuth fallback={<ChatPageSkeleton />}>
       <div className="h-screen flex flex-col overflow-hidden">
         <ChatHeader title={title} />
         <ChatDrawer />

@@ -15,20 +15,18 @@ export default function MessageInput({
   onChange: (v: string) => void;
   onSend: () => void;
   onSelectImages: (files: File[]) => void;
-  images?: string[]; // accepted but not used internally
-  onRemoveImage?: (index: number) => void; // accepted but not used internally
+  images?: string[];
+  onRemoveImage?: (index: number) => void;
   disabled?: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const textRef = useRef<HTMLTextAreaElement | null>(null);
-  // local copy UI is not used here; keep minimal state footprint
 
-  // Auto-resize the textarea height based on content
   useEffect(() => {
     const el = textRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, 200) + "px"; // cap height ~200px
+    el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [value]);
 
   return (
@@ -51,7 +49,6 @@ export default function MessageInput({
           if (files.length) onSelectImages(files);
         }}
       />
-      {/* Image previews are rendered above the input bar in the page container */}
       <textarea
         ref={textRef}
         aria-label="Message input"
@@ -78,3 +75,4 @@ export default function MessageInput({
     </div>
   );
 }
+

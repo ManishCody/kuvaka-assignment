@@ -18,7 +18,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
 
@@ -47,6 +46,19 @@ A Next.js 15 (App Router) application implementing a simple phone-based login fl
 - State management: `@reduxjs/toolkit` with slices for `auth`, `chats`, and `ui` stored in a single Redux store (`src/store/index.ts`).
 - Persistence: `auth` and `chats` slices are persisted to `localStorage` on the client.
 - Navigation: After login, user is redirected to `/dashboard`.
+
+## Recent Updates
+
+- Introduced a chat loading skeleton shown while verifying authentication from `localStorage`.
+  - `RequireAuth` now accepts a `fallback` prop and shows it during mount or when unauthenticated: `src/components/auth/RequireAuth.tsx`.
+  - Chat page passes `ChatPageSkeleton` as fallback: `src/app/chat/[id]/page.tsx` and `src/components/chat/ChatPageSkeleton.tsx`.
+- Refactored the phone login step into smaller components and a reusable hook:
+  - Hook: `src/components/auth/hooks/usePhoneForm.ts` (form setup, Zod validation, autofocus).
+  - Components: `src/components/auth/phone/CountrySelect.tsx`, `PhoneNumberInput.tsx`, `SendOtpButton.tsx`.
+  - Parent: `src/components/auth/PhoneStep.tsx` now composes these pieces.
+- Autofocus improvements:
+  - Phone input auto-focuses after country list loads (and on mount).
+  - OTP input (`InputOTP`) auto-focuses the first slot when the step appears.
 
 ## Tech Stack
 
@@ -96,8 +108,14 @@ my-next-app/
 │  ├─ components/
 │  │  ├─ auth/
 │  │  │  ├─ Header.tsx            # Auth screen header
-│  │  │  ├─ PhoneStep.tsx         # Phone entry step
-│  │  │  └─ OTPStep.tsx           # OTP entry step
+│  │  │  ├─ PhoneStep.tsx         # Phone entry step (composed)
+│  │  │  ├─ OTPStep.tsx           # OTP entry step
+│  │  │  ├─ hooks/
+│  │  │  │  └─ usePhoneForm.ts    # RHF + Zod + autofocus for phone step
+│  │  │  └─ phone/
+│  │  │     ├─ CountrySelect.tsx  # Country code selector
+│  │  │     ├─ PhoneNumberInput.tsx # Phone input with autofocus
+│  │  │     └─ SendOtpButton.tsx  # Submit button for sending OTP
 │  │  └─ redux-provider.tsx       # Wraps the app with Redux Provider
 │  ├─ store/
 │  │  ├─ index.ts                 # Redux store, persistence to localStorage
@@ -123,90 +141,3 @@ my-next-app/
 - `chatsSlice.ts` seeds some demo chats and messages and provides actions to create/delete chats and add messages.
 - `uiSlice.ts` stores small UI flags (drawer, search, history toggles).
 - `src/store/index.ts` persists `auth` and `chats` into `localStorage` on each store update (client-only safeguards).
-
-### Component and Store Interaction (Mermaid)
-
-```mermaid
-sequenceDiagram
-  autonumber
-  participant User
-  participant Page as app/page.tsx
-  participant Phone as PhoneStep.tsx
-  participant OTP as OTPStep.tsx
-  participant Store as Redux Store
-  participant Auth as authSlice
-  participant Router as next/navigation
-
-  User->>Page: Visit /
-  Page->>Phone: Render phone entry
-  User->>Phone: Enter country + phone, click Send OTP
-  Phone->>Page: onSend()
-  Page->>Page: validatePhone(...)
-  Page->>OTP: Render OTP step
-  User->>OTP: Enter 6-digit code, click Verify
-  OTP->>Page: onVerify()
-  Page->>Store: dispatch(login({ id, phone }))
-  Store->>Auth: reducer toggles isAuthenticated=true
-  Store-->>Page: state.auth.isAuthenticated = true
-  Page->>Router: router.push('/dashboard')
-```
-
-### Redux Store and Persistence (Mermaid)
-
-```mermaid
-flowchart LR
-  subgraph S[Redux Store]
-    A[authSlice]
-    C[chatsSlice]
-    U[uiSlice]
-  end
-
-  App[Client Components] -- useAppSelector/useAppDispatch --> S
-  S -- subscribe --> LS[(localStorage)]
-  LS -. on load .-> S
-
-  A <--> LS
-  C <--> LS
-  U -. no persistence .-x LS
-```
-
-- In `src/store/index.ts`, `preloadedState` is constructed client-side by reading `localStorage`.
-- A guarded `store.subscribe` persists `auth` and `chats` back to `localStorage` on each state change.
-
-## Key Files Explained
-
-- `src/components/redux-provider.tsx` — Wraps children with `<Provider store={store}>` so the Redux store is available app-wide.
-- `src/store/index.ts` — Creates the Redux store using `configureStore`. Handles client-only preloading and persistence of `auth` and `chats`.
-- `src/store/hooks.ts` — Typed hooks `useAppDispatch` and `useAppSelector` using `RootState` and `AppDispatch` from the store.
-- `src/store/slices/authSlice.ts` — Auth reducer and actions: `login`, `logout`.
-- `src/store/slices/chatsSlice.ts` — Demo data plus `createChat`, `deleteChat`, `addMessage`.
-- `src/store/slices/uiSlice.ts` — UI flags and actions for controlling small UI states.
-- `src/app/page.tsx` — Login screen with animated step transitions, country fetch, validation, and dispatch to Redux.
-
-## Common Tasks
-
-- Add a new slice:
-  1. Create `src/store/slices/newSlice.ts` with `createSlice`.
-  2. Register it in the store's reducer map in `src/store/index.ts`.
-  3. Export actions/selectors and use via `useAppDispatch` and `useAppSelector`.
-
-- Use Redux in components:
-
-```ts
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { someAction } from "@/store/slices/someSlice";
-
-const value = useAppSelector((s) => s.some.value);
-const dispatch = useAppDispatch();
-dispatch(someAction(payload));
-```
-
-## Notes on TypeScript and Redux Toolkit
-
-- Prefer reducers map syntax in `configureStore({ reducer: { ... } })` or combine with `combineReducers` to keep types explicit.
-- Persist only serializable state. Avoid storing functions or complex classes in slices.
-- Guard all `localStorage` access with `typeof window !== 'undefined'`.
-
-## License
-
-This project is for assignment/demo purposes.

@@ -6,8 +6,10 @@ import { useAppSelector } from "@/store/hooks";
 
 export default function RequireAuth({
   children,
+  fallback,
 }: {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }) {
   const router = useRouter();
   const isAuthed = useAppSelector((s) => s.auth.isAuthenticated);
@@ -24,9 +26,9 @@ export default function RequireAuth({
   }, [mounted, isAuthed, router]);
 
   if (!mounted) {
-    return <div className="min-h-screen" />;
+    return fallback ? <>{fallback}</> : <div className="min-h-screen" />;
   }
 
-  if (!isAuthed) return <div className="min-h-screen" />;
+  if (!isAuthed) return fallback ? <>{fallback}</> : <div className="min-h-screen" />;
   return <>{children}</>;
 }

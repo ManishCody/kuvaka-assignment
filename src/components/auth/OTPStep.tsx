@@ -65,6 +65,7 @@ export default function OTPStep({
           render={({ field }) => (
             <InputOTP
               maxLength={6}
+              autoFocus
               value={field.value}
               onChange={(val) => {
                 field.onChange(val);

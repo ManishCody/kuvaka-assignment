@@ -20,7 +20,6 @@ export default function ChatList({ activeId }: { activeId?: string }) {
             c.lastMessage.toLowerCase().includes(q),
         )
       : chats;
-    // Always sort newest first by updatedAt
     return [...base].sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
@@ -29,7 +28,6 @@ export default function ChatList({ activeId }: { activeId?: string }) {
 
   return (
     <div className="space-y-2">
-      {/* Empty state: no chats created */}
       {chats.length === 0 && (
         <div className="text-center py-10 text-muted-foreground border rounded-md">
           <div className="flex flex-col items-center gap-2">
@@ -41,7 +39,6 @@ export default function ChatList({ activeId }: { activeId?: string }) {
         </div>
       )}
 
-      {/* Empty state: search yielded no results */}
       {chats.length > 0 && filtered.length === 0 && (
         <div className="text-center py-10 text-muted-foreground border rounded-md">
           <div className="flex flex-col items-center gap-2">

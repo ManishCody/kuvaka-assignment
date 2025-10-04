@@ -17,19 +17,16 @@ export default function DashboardHeader() {
   const search = useAppSelector((s: RootState) => s.ui.searchQuery);
   const [draft, setDraft] = useState(search);
 
-  // keep local input in sync if search changes elsewhere
   useEffect(() => {
     setDraft(search);
   }, [search]);
 
-  // debounce dispatch to Redux (250ms)
   useEffect(() => {
     const t = setTimeout(() => {
       if (draft !== search) dispatch(setSearchQuery(draft));
     }, 250);
     return () => clearTimeout(t);
   }, [draft, search, dispatch]);
-  // Dashboard always shows history list; toggle is only for chat page
 
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -50,7 +47,6 @@ export default function DashboardHeader() {
             onChange={(e) => setDraft(e.target.value)}
           />
         </div>
-        {/* No history toggle on dashboard */}
         <ThemeToggle />
         <Button
           variant="ghost"
@@ -66,3 +62,4 @@ export default function DashboardHeader() {
     </header>
   );
 }
+
