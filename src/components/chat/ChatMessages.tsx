@@ -57,7 +57,7 @@ export default function ChatMessages({
     if (isNearBottom() || last?.role === "user") {
       scrollToBottom(false);
     }
-  }, [messages.length]);
+  }, [messages]);
 
   useEffect(() => {
     if (isTyping && isNearBottom()) {

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Country } from "@/types/country";
 import type { PhoneForm } from "@/components/auth/hooks/usePhoneForm";
+import Image from "next/image";
 
 export function CountrySelect(props: {
   control: Control<PhoneForm>;
@@ -43,7 +44,13 @@ export function CountrySelect(props: {
                   <SelectItem key={country.cca2} value={getCountryCode(country)}>
                     <div className="flex items-center gap-2">
                       <div className="relative w-5 h-4 overflow-hidden rounded-[2px]">
-                        <img src={country.flags.svg} alt={`${country.name.common} flag`} className="object-cover w-5 h-4" />
+                        <Image
+                          src={country.flags.svg}
+                          alt={`${country.name.common} flag`}
+                          fill
+                          sizes="20px"
+                          className="object-cover"
+                        />
                       </div>
                       <span>{country.name.common}</span>
                       <span className="text-muted-foreground ml-auto">{getCountryCode(country)}</span>

@@ -32,9 +32,6 @@ export default function ChatRoomPage() {
   const [draft, setDraft] = useState("");
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [pageSize] = useState(20);
-  const [visibleCount, setVisibleCount] = useState(20);
-  const [loadingOlder, setLoadingOlder] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const nextAiAtRef = useRef<number>(0);
   const pendingAiRef = useRef<number>(0);
@@ -65,9 +62,6 @@ export default function ChatRoomPage() {
     scrollToBottom(true);
   }, []);
 
-  useEffect(() => {
-    setVisibleCount((prev) => Math.min(messages.length, Math.max(pageSize, prev)));
-  }, [messages.length, pageSize]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -79,7 +73,7 @@ export default function ChatRoomPage() {
     if (lastMessage?.role === "user" || nearBottom) {
       scrollToBottom(false);
     }
-  }, [messages.length, showHistory]);
+  }, [messages, showHistory]);
 
   const handleSend = () => {
     if (!id) return;
@@ -119,24 +113,6 @@ export default function ChatRoomPage() {
       setIsTyping(pendingAiRef.current > 0);
       scrollToBottom(false);
     }, delay);
-  };
-
-  const onScrollMessages = () => {
-    const el = scrollRef.current;
-    if (!el || loadingOlder) return;
-    if (el.scrollTop <= 0 && visibleCount < messages.length) {
-      setLoadingOlder(true);
-      const prevHeight = el.scrollHeight;
-      setTimeout(() => {
-        setVisibleCount((c) => Math.min(messages.length, c + pageSize));
-        setLoadingOlder(false);
-        requestAnimationFrame(() => {
-          if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight - prevHeight;
-          }
-        });
-      }, 700);
-    }
   };
 
   if (!chat) {

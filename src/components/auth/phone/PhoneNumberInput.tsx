@@ -47,9 +47,8 @@ export function PhoneNumberInput(props: {
                 onKeyDown={(e) => e.key === "Enter" && onEnter()}
                 className="flex-1"
                 ref={(el) => {
-                  (inputRef as any).current = el;
-                  if (typeof field.ref === "function") field.ref(el);
-                  else (field as any).ref = el;
+                  inputRef.current = el;
+                  (field.ref as (instance: HTMLInputElement | null) => void)(el);
                 }}
                 autoFocus
               />
